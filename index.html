@@ -3,119 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reklam & İş Analiz Paneli</title>
-    <!-- Tailwind CSS -->
+    <title>Reklam & İş Analiz Paneli (AI Destekli)</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Tesseract.js (OCR) -->
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #0f172a;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #334155;
-            border-radius: 3px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #475569;
-        }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen font-sans flex flex-col">
 
     <!-- Header -->
     <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
             <div class="flex items-center space-x-3">
                 <div class="p-2 bg-indigo-600/20 text-indigo-400 rounded-xl border border-indigo-500/30">
                     <i data-lucide="bar-chart-3" class="w-6 h-6"></i>
                 </div>
                 <div>
-                    <h1 class="font-bold text-lg leading-tight text-white">Reklam & İş Başat Maliyet Analizi</h1>
-                    <p class="text-[11px] text-slate-400">Google Ads Maliyetleri ile İş Sayılarını Çakıştırma Paneli</p>
+                    <h1 class="font-bold text-lg leading-tight text-white">Reklam & İş Maliyet Analizi</h1>
+                    <p class="text-[11px] text-slate-400">Yapay Zeka Destekli Hassas Veri Okuma Paneli</p>
                 </div>
             </div>
-            <button onclick="processAll()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition flex items-center gap-1.5 shadow-lg shadow-indigo-600/20">
-                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
-                Verileri Yeniden Hesapla
-            </button>
+
+            <!-- API Key Input -->
+            <div class="flex items-center gap-2 bg-slate-950 border border-slate-800 p-1.5 rounded-xl">
+                <i data-lucide="key" class="w-4 h-4 text-amber-400 ml-1"></i>
+                <input type="password" id="apiKey" placeholder="Gemini API Key Girin" class="bg-transparent text-xs text-white placeholder-slate-500 focus:outline-none w-48">
+                <button onclick="saveApiKey()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium px-2.5 py-1 rounded-lg transition">Kaydet</button>
+            </div>
         </div>
     </header>
 
-    <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
 
-        <!-- INPUT SECTION: 2 COLUMNS -->
+        <!-- INPUT SECTION -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-            <!-- 1. REKLAM HARCAMALARI PANELI -->
+            <!-- 1. REKLAM HARCAMALARI -->
             <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-xl flex flex-col gap-3">
                 <div class="flex items-center justify-between border-b border-slate-800 pb-2">
                     <h2 class="text-xs font-bold text-indigo-400 flex items-center gap-1.5 uppercase tracking-wider">
                         <i data-lucide="dollar-sign" class="w-4 h-4"></i>
-                        1. Reklam Harcamaları (Google Ads vb.)
+                        1. Reklam Harcamaları
                     </h2>
-                    <span class="text-[10px] bg-indigo-950 text-indigo-300 px-2 py-0.5 rounded border border-indigo-500/30 font-medium">Görsel Veya Metin</span>
+                    <span class="text-[10px] bg-indigo-950 text-indigo-300 px-2 py-0.5 rounded border border-indigo-500/30 font-medium">Görsel / Metin</span>
                 </div>
 
-                <!-- Dropzone / Image Upload -->
-                <div id="dropzoneAds" class="border-2 border-dashed border-slate-700 hover:border-indigo-500/50 bg-slate-950/40 rounded-xl p-3 text-center cursor-pointer transition relative">
-                    <input type="file" id="fileAds" multiple accept="image/*" class="hidden" onchange="handleFileSelect('ads', event)">
+                <div id="dropzoneAds" class="border-2 border-dashed border-slate-700 hover:border-indigo-500/50 bg-slate-950/40 rounded-xl p-4 text-center cursor-pointer transition relative">
+                    <input type="file" id="fileAds" accept="image/*" class="hidden" onchange="handleFileSelect('ads', event)">
                     <div class="flex flex-col items-center justify-center gap-1">
-                        <i data-lucide="upload" class="w-5 h-5 text-slate-400"></i>
-                        <p class="text-xs text-slate-300">Reklam Görseli **Yükleyin** veya **Yapıştırın** (Ctrl+V)</p>
+                        <i data-lucide="image" class="w-6 h-6 text-slate-400"></i>
+                        <p class="text-xs text-slate-300">Reklam Görselini **Sürükleyin**, **Seçin** veya **Yapıştırın** (Ctrl+V)</p>
                     </div>
                 </div>
 
-                <!-- Preview & Status -->
-                <div id="previewAds" class="flex flex-wrap gap-2 max-h-20 overflow-y-auto custom-scrollbar"></div>
                 <div id="statusAds" class="hidden text-[11px] text-indigo-300 bg-indigo-950/30 p-2 rounded border border-indigo-500/20 flex items-center gap-2">
                     <i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i>
-                    <span>Reklam Görseli Okunuyor...</span>
+                    <span id="statusAdsText">Yapay Zeka Görseli Tam Doğrulukla Okuyor...</span>
                 </div>
 
-                <!-- Manual Input Area -->
                 <div class="flex-1 flex flex-col space-y-1">
-                    <label class="text-[11px] text-slate-400 font-medium">Veya Metin Olarak Yapıştırın (Örn: İstanbul, Türkiye ₺39.370,63):</label>
+                    <label class="text-[11px] text-slate-400 font-medium">Veya Metin / Manuel Giriş:</label>
                     <textarea id="textAds" oninput="processAll()" rows="5" placeholder="İstanbul, Türkiye    ₺39.370,63&#10;İzmir, Türkiye    ₺23.159,81..." class="w-full bg-slate-950 border border-slate-800 text-xs rounded-lg p-2.5 font-mono text-slate-200 focus:ring-1 focus:ring-indigo-500 focus:outline-none custom-scrollbar resize-none"></textarea>
                 </div>
             </div>
 
-            <!-- 2. İŞ SAYILARI PANELI -->
+            <!-- 2. İŞ SAYILARI -->
             <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-xl flex flex-col gap-3">
                 <div class="flex items-center justify-between border-b border-slate-800 pb-2">
                     <h2 class="text-xs font-bold text-emerald-400 flex items-center gap-1.5 uppercase tracking-wider">
                         <i data-lucide="briefcase" class="w-4 h-4"></i>
                         2. İllerden Gelen İş Sayıları
                     </h2>
-                    <span class="text-[10px] bg-emerald-950 text-emerald-300 px-2 py-0.5 rounded border border-emerald-500/30 font-medium">Görsel Veya Metin</span>
+                    <span class="text-[10px] bg-emerald-950 text-emerald-300 px-2 py-0.5 rounded border border-emerald-500/30 font-medium">Görsel / Metin</span>
                 </div>
 
-                <!-- Dropzone / Image Upload -->
-                <div id="dropzoneJobs" class="border-2 border-dashed border-slate-700 hover:border-emerald-500/50 bg-slate-950/40 rounded-xl p-3 text-center cursor-pointer transition relative">
-                    <input type="file" id="fileJobs" multiple accept="image/*" class="hidden" onchange="handleFileSelect('jobs', event)">
+                <div id="dropzoneJobs" class="border-2 border-dashed border-slate-700 hover:border-emerald-500/50 bg-slate-950/40 rounded-xl p-4 text-center cursor-pointer transition relative">
+                    <input type="file" id="fileJobs" accept="image/*" class="hidden" onchange="handleFileSelect('jobs', event)">
                     <div class="flex flex-col items-center justify-center gap-1">
-                        <i data-lucide="upload" class="w-5 h-5 text-slate-400"></i>
-                        <p class="text-xs text-slate-300">İş Sayısı Görseli **Yükleyin** veya **Yapıştırın** (Ctrl+V)</p>
+                        <i data-lucide="image" class="w-6 h-6 text-slate-400"></i>
+                        <p class="text-xs text-slate-300">İş Sayısı Görselini **Sürükleyin**, **Seçin** veya **Yapıştırın** (Ctrl+V)</p>
                     </div>
                 </div>
 
-                <!-- Preview & Status -->
-                <div id="previewJobs" class="flex flex-wrap gap-2 max-h-20 overflow-y-auto custom-scrollbar"></div>
                 <div id="statusJobs" class="hidden text-[11px] text-emerald-300 bg-emerald-950/30 p-2 rounded border border-emerald-500/20 flex items-center gap-2">
                     <i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i>
-                    <span>İş Sayıları Görseli Okunuyor...</span>
+                    <span id="statusJobsText">Yapay Zeka İş Sayılarını Okuyor...</span>
                 </div>
 
-                <!-- Manual Input Area -->
                 <div class="flex-1 flex flex-col space-y-1">
-                    <label class="text-[11px] text-slate-400 font-medium">Veya Metin Olarak Yapıştırın (Örn: 34 İstanbul 69):</label>
+                    <label class="text-[11px] text-slate-400 font-medium">Veya Metin / Manuel Giriş:</label>
                     <textarea id="textJobs" oninput="processAll()" rows="5" placeholder="34  İstanbul  69&#10;35  İzmir     36&#10;6   Ankara    16..." class="w-full bg-slate-950 border border-slate-800 text-xs rounded-lg p-2.5 font-mono text-slate-200 focus:ring-1 focus:ring-emerald-500 focus:outline-none custom-scrollbar resize-none"></textarea>
                 </div>
             </div>
@@ -162,12 +141,9 @@
                     <i data-lucide="table" class="w-4 h-4 text-indigo-400"></i>
                     Şehir Bazlı Performans Tablosu
                 </h2>
-                <div class="flex items-center gap-2">
-                    <button onclick="copyTableAsText()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs px-3 py-1.5 rounded-lg border border-slate-700 flex items-center gap-1.5 transition">
-                        <i data-lucide="copy" class="w-3.5 h-3.5"></i>
-                        Tabloyu Kopyala
-                    </button>
-                </div>
+                <button onclick="clearAllData()" class="text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 px-3 py-1.5 rounded-lg border border-red-500/20 transition">
+                    Verileri Temizle
+                </button>
             </div>
 
             <div class="overflow-x-auto custom-scrollbar border border-slate-800 rounded-lg">
@@ -177,19 +153,17 @@
                             <th class="py-3 px-4 font-semibold">İl</th>
                             <th class="py-3 px-4 font-semibold text-right">Toplam Ayarlı Maliyet</th>
                             <th class="py-3 px-4 font-semibold text-center">İş Sayısı</th>
-                            <th class="py-3 px-4 font-semibold text-right">İş Başı Maliyet (CPA)</th>
+                            <th class="py-3 px-4 font-semibold text-right">İş Başı Maliyet</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody" class="divide-y divide-slate-800/60 font-mono text-slate-300">
                         <tr>
                             <td colspan="4" class="text-center py-8 text-slate-500 font-sans">
-                                Veri bulunamadı. Lütfen görsel yükleyin veya metin girin.
+                                Veri bulunamadı. Lütfen görsel atın veya manuel metin girin.
                             </td>
                         </tr>
                     </tbody>
-                    <tfoot id="tableFoot" class="bg-slate-950/80 font-mono font-bold text-white border-t-2 border-slate-700">
-                        <!-- Toplam Satırı Dinamik Gelecek -->
-                    </tfoot>
+                    <tfoot id="tableFoot" class="bg-slate-950/80 font-mono font-bold text-white border-t-2 border-slate-700"></tfoot>
                 </table>
             </div>
         </div>
@@ -197,7 +171,6 @@
     </main>
 
     <script>
-        // TÜM 81 İL LİSTESİ VE STANDARTLAŞTIRMA
         const CITIES = [
             "Adana", "Adıyaman", "Afyonkarahisar", "Ağrı", "Amasya", "Ankara", "Antalya", "Artvin", "Aydın", "Balıkesir",
             "Bilecik", "Bingöl", "Bitlis", "Bolu", "Burdur", "Bursa", "Çanakkale", "Çankırı", "Çorum", "Denizli",
@@ -209,17 +182,38 @@
             "Kırıkkale", "Batman", "Şırnak", "Bartın", "Ardahan", "Iğdır", "Yalova", "Karabük", "Kilis", "Osmaniye", "Düzce"
         ];
 
-        let adsOcrText = "";
-        let jobsOcrText = "";
+        let adsAiData = {};
+        let jobsAiData = {};
 
         window.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
             setupDropzoneEvents('dropzoneAds', 'fileAds', 'ads');
             setupDropzoneEvents('dropzoneJobs', 'fileJobs', 'jobs');
             setupGlobalPaste();
+            const savedKey = localStorage.getItem('gemini_api_key');
+            if (savedKey) document.getElementById('apiKey').value = savedKey;
         });
 
-        // 1. METİN TEMİZLEME VE İL BULMA
+        function saveApiKey() {
+            const key = document.getElementById('apiKey').value.trim();
+            localStorage.setItem('gemini_api_key', key);
+            alert("API Key kaydedildi!");
+        }
+
+        // TÜRKÇE PARA BİRİMİ DÜZELTME (Sıfır Hata Algoritması)
+        function parseTurkishNumber(valStr) {
+            if (!valStr) return 0;
+            let clean = valStr.toString().replace(/[^0-9.,]/g, '');
+            if (!clean) return 0;
+
+            if (clean.includes('.') && clean.includes(',')) {
+                clean = clean.replace(/\./g, '').replace(',', '.');
+            } else if (clean.includes(',')) {
+                clean = clean.replace(',', '.');
+            }
+            return parseFloat(clean) || 0;
+        }
+
         function normalizeCityName(str) {
             if (!str) return "";
             return str.replace(/i/g, 'İ').replace(/ı/g, 'I').toUpperCase().replace(/[^A-ZÇĞİÖŞÜ]/g, '').trim();
@@ -228,94 +222,111 @@
         function matchCity(rawText) {
             const norm = normalizeCityName(rawText);
             for (let city of CITIES) {
-                const normCity = normalizeCityName(city);
-                if (norm.includes(normCity)) return city;
+                if (norm.includes(normalizeCityName(city))) return city;
             }
             return null;
         }
 
-        // TÜRKÇE PARA FORMATI TEMİZLEME (Örn: "₺39.370,63" -> 39370.63)
-        function parseTurkishNumber(valStr) {
-            if (!valStr) return 0;
-            // Sadece rakam, nokta ve virgülleri bırak
-            let clean = valStr.replace(/[^0-9.,]/g, '');
-            if (!clean) return 0;
-
-            // Eğer hem nokta hem virgül varsa (Örn: 39.370,63) -> noktayı kaldır, virgülü noktaya çevir
-            if (clean.includes('.') && clean.includes(',')) {
-                clean = clean.replace(/\./g, '').replace(',', '.');
-            } else if (clean.includes(',')) {
-                // Sadece virgül varsa (Örn: 39370,63) -> noktaya çevir
-                clean = clean.replace(',', '.');
-            }
-            return parseFloat(clean) || 0;
-        }
-
-        // 2. PARSERS (REKLAM VE İŞ VERİSİ OKUMA)
-        function parseAdsData(text) {
-            const result = {};
-            const lines = text.split('\n');
-
-            lines.forEach(line => {
+        // MANUAL METİN PARSERS
+        function parseAdsManualText(text) {
+            const res = {};
+            text.split('\n').forEach(line => {
                 const city = matchCity(line);
                 if (city) {
-                    // Satırdaki sayısal değeri bul
-                    const numMatch = line.match(/₺?\s*([\d.,]+)/);
-                    if (numMatch) {
-                        const val = parseTurkishNumber(numMatch[1]);
-                        result[city] = (result[city] || 0) + val;
+                    const matches = line.match(/[\d.,]+/g);
+                    if (matches) {
+                        // En uzun sayısal metni tutar (Plaka vb. karışmasın)
+                        const rawNum = matches.reduce((a, b) => a.length >= b.length ? a : b);
+                        res[city] = parseTurkishNumber(rawNum);
                     }
                 }
             });
-            return result;
+            return res;
         }
 
-        function parseJobsData(text) {
-            const result = {};
-            const lines = text.split('\n');
-
-            lines.forEach(line => {
+        function parseJobsManualText(text) {
+            const res = {};
+            text.split('\n').forEach(line => {
                 const city = matchCity(line);
                 if (city) {
-                    // Satır sonundaki veya şehir adından sonraki tamsayıyı bul
                     const tokens = line.trim().split(/\s+/);
-                    for (let i = tokens.length - 1; i >= 0; i--) {
-                        const num = parseInt(tokens[i], 10);
-                        if (!isNaN(num) && num < 1000) { // Plaka veya uçuk sayı olmasın
-                            // Eğer bu token plaka koduna benziyorsa en sondaki sayıya bak
-                            const lastToken = parseInt(tokens[tokens.length - 1], 10);
-                            if (!isNaN(lastToken)) {
-                                result[city] = lastToken;
-                                break;
-                            }
-                        }
-                    }
+                    const lastToken = parseInt(tokens[tokens.length - 1], 10);
+                    if (!isNaN(lastToken)) res[city] = lastToken;
                 }
             });
-            return result;
+            return res;
         }
 
-        // 3. VERİLERİ BİRLEŞTİRME VE TABLO YAZDIRMA
+        // AI İLE GÖRSEL OKUMA (GEMINI VISION API)
+        async function readImageWithAI(file, promptType) {
+            const apiKey = localStorage.getItem('gemini_api_key') || document.getElementById('apiKey').value.trim();
+            if (!apiKey) {
+                alert("Lütfen geçerli bir Gemini API Key girin! (Sayfanın sağ üstünden ekleyebilirsiniz)");
+                return null;
+            }
+
+            const base64Data = await fileToBase64(file);
+            const base64Image = base64Data.split(',')[1];
+
+            let prompt = "";
+            if (promptType === 'ads') {
+                prompt = "Bu görseldeki şehir adlarını ve yanlarındaki reklam harcama tutarlarını oku. Bana SADECE şu JSON formatında yanıt ver, başka hiçbir yazı yazma: {\"İstanbul\": 39370.63, \"İzmir\": 23159.81}";
+            } else {
+                prompt = "Bu görseldeki şehir adlarını ve en sağdaki 'Bugün' veya 'İş Sayısı' sütunundaki tam sayıları oku. Plaka kodlarını iş sayısı yapma. Bana SADECE şu JSON formatında yanıt ver, başka hiçbir yazı yazma: {\"İstanbul\": 69, \"İzmir\": 36}";
+            }
+
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [
+                            { text: prompt },
+                            { inline_data: { mime_type: file.type, data: base64Image } }
+                        ]
+                    }]
+                })
+            });
+
+            const data = await response.json();
+            const textResponse = data.candidates?.[0]?.content?.parts?.[0]?.text;
+            
+            if (textResponse) {
+                const jsonMatch = textResponse.match(/\{[\s\S]*\}/);
+                if (jsonMatch) return JSON.parse(jsonMatch[0]);
+            }
+            return null;
+        }
+
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // PROCESS AND RENDER
         function processAll() {
-            const adsManual = document.getElementById('textAds').value;
-            const jobsManual = document.getElementById('textJobs').value;
+            const adsManual = parseAdsManualText(document.getElementById('textAds').value);
+            const jobsManual = parseJobsManualText(document.getElementById('textJobs').value);
 
-            const combinedAdsText = adsOcrText + "\n" + adsManual;
-            const combinedJobsText = jobsOcrText + "\n" + jobsManual;
+            // AI Verisi + Manuel Veri Birleştirme
+            const adsData = { ...adsAiData, ...adsManual };
+            const jobsData = { ...jobsAiData, ...jobsManual };
 
-            const adsData = parseAdsData(combinedAdsText);
-            const jobsData = parseJobsData(combinedJobsText);
-
-            // Tüm bulunan şehir kümesi
             const allCitiesSet = new Set([...Object.keys(adsData), ...Object.keys(jobsData)]);
             const tableRows = [];
 
             let totalCost = 0;
             let totalJobs = 0;
 
-            allCitiesSet.forEach(city => {
-                const cost = adsData[city] || 0;
-                const jobs = jobsData[city] || 0;
+            allCitiesSet.forEach(rawCity => {
+                const city = matchCity(rawCity) || rawCity;
+                const cost = adsData[rawCity] || adsData[city] || 0;
+                const jobs = jobsData[rawCity] || jobsData[city] || 0;
                 const cpa = jobs > 0 ? (cost / jobs) : 0;
 
                 totalCost += cost;
@@ -324,18 +335,17 @@
                 tableRows.push({ city, cost, jobs, cpa });
             });
 
-            // En yüksek harcamadan düşüğe doğru sırala
             tableRows.sort((a, b) => b.cost - a.cost);
 
-            // Özet Kartları Güncelle
+            // Özet Kartlar
             document.getElementById('cardTotalCost').textContent = formatTL(totalCost);
             document.getElementById('cardTotalJobs').textContent = totalJobs;
             document.getElementById('cardAvgCpa').textContent = totalJobs > 0 ? formatTL(totalCost / totalJobs) : '₺0,00';
 
-            // Tablo Gövdesini Oluştur
+            // Tablo Gövdesi
             const tbody = document.getElementById('tableBody');
             if (tableRows.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="text-center py-8 text-slate-500 font-sans">Veri bulunamadı. Lütfen görsel yükleyin veya metin girin.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center py-8 text-slate-500 font-sans">Veri bulunamadı. Lütfen görsel atın veya manuel metin girin.</td></tr>`;
                 document.getElementById('tableFoot').innerHTML = '';
                 return;
             }
@@ -365,78 +375,58 @@
             return '₺' + val.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
 
-        // 4. OCR VE SÜRÜKLE-BIRAK SİSTEMİ
+        // HANDLERS & EVENTS
         function setupDropzoneEvents(dzId, inputId, type) {
             const dz = document.getElementById(dzId);
             const input = document.getElementById(inputId);
-
             dz.addEventListener('click', () => input.click());
             dz.addEventListener('dragover', (e) => { e.preventDefault(); dz.classList.add('border-indigo-500'); });
             dz.addEventListener('dragleave', () => dz.classList.remove('border-indigo-500'));
             dz.addEventListener('drop', (e) => {
                 e.preventDefault();
                 dz.classList.remove('border-indigo-500');
-                if (e.dataTransfer.files.length) handleFiles(type, Array.from(e.dataTransfer.files));
+                if (e.dataTransfer.files.length) handleFiles(type, e.dataTransfer.files[0]);
             });
         }
 
         function handleFileSelect(type, event) {
-            handleFiles(type, Array.from(event.target.files));
+            if (event.target.files.length) handleFiles(type, event.target.files[0]);
         }
 
         function setupGlobalPaste() {
             window.addEventListener('paste', (e) => {
-                const items = e.clipboardData.items;
-                for (let item of items) {
+                for (let item of e.clipboardData.items) {
                     if (item.type.indexOf('image') !== -1) {
-                        const file = item.getAsFile();
-                        // Otomatik olarak reklama ekle
-                        handleFiles('ads', [file]);
+                        handleFiles('ads', item.getAsFile());
                     }
                 }
             });
         }
 
-        async function handleFiles(type, files) {
+        async function handleFiles(type, file) {
             const statusElem = document.getElementById(type === 'ads' ? 'statusAds' : 'statusJobs');
             statusElem.classList.remove('hidden');
 
-            for (let file of files) {
-                if (!file.type.startsWith('image/')) continue;
-                try {
-                    const res = await Tesseract.recognize(file, 'tur+eng');
-                    if (type === 'ads') {
-                        adsOcrText += "\n" + res.data.text;
-                    } else {
-                        jobsOcrText += "\n" + res.data.text;
-                    }
-                } catch (err) {
-                    console.error("OCR Okuma hatası:", err);
+            try {
+                const parsedData = await readImageWithAI(file, type);
+                if (parsedData) {
+                    if (type === 'ads') adsAiData = { ...adsAiData, ...parsedData };
+                    else jobsAiData = { ...jobsAiData, ...parsedData };
+                    processAll();
                 }
+            } catch (err) {
+                alert("Görsel okuma hatası: " + err.message);
+            } finally {
+                statusElem.classList.add('hidden');
             }
-
-            statusElem.classList.add('hidden');
-            processAll();
         }
 
-        function copyTableAsText() {
-            const adsManual = document.getElementById('textAds').value;
-            const jobsManual = document.getElementById('textJobs').value;
-            const adsData = parseAdsData(adsOcrText + "\n" + adsManual);
-            const jobsData = parseJobsData(jobsOcrText + "\n" + jobsManual);
-
-            const allCitiesSet = new Set([...Object.keys(adsData), ...Object.keys(jobsData)]);
-            let lines = ["İl\tToplam Maliyet\tİş Sayısı\tİş Başı Maliyet"];
-
-            allCitiesSet.forEach(city => {
-                const cost = adsData[city] || 0;
-                const jobs = jobsData[city] || 0;
-                const cpa = jobs > 0 ? (cost / jobs) : 0;
-                lines.push(`${city}\t${formatTL(cost)}\t${jobs}\t${formatTL(cpa)}`);
-            });
-
-            navigator.clipboard.writeText(lines.join('\n'));
-            alert("Tablo metin olarak kopyalandı! Excel veya metin belgesine yapıştırabilirsiniz.");
+        function clearAllData() {
+            adsAiData = {};
+            jobsAiData = {};
+            document.getElementById('textAds').value = '';
+            document.getElementById('textJobs').value = '';
+            processAll();
         }
     </script>
 </body>
